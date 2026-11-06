@@ -1,0 +1,68 @@
+# --- Секреты и настройки окружения ---
+.env
+.env.*
+!.env.example
+*.env
+rpg_backend/.env
+rpg_backend/.env.*
+!rpg_backend/.env.example
+
+# --- Данные приложения: база, картинки, сцены, логи ---
+# JSON-контент (миры, расы, классы) в репозитории остаётся, а состояние — нет
+rpg_backend/data/*
+!rpg_backend/data/*.json
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+coverage/
+htmlcov/
+
+# --- Flutter / Dart ---
+rpg_client/.dart_tool/
+rpg_client/.packages
+rpg_client/build/
+rpg_client/.flutter-plugins
+rpg_client/.flutter-plugins-dependencies
+rpg_client/**/ephemeral/
+rpg_client/android/.gradle/
+rpg_client/android/app/build/
+rpg_client/android/local.properties
+rpg_client/android/key.properties
+rpg_client/android/build/
+rpg_client/ios/Pods/
+rpg_client/ios/.symlinks/
+*.jks
+*.keystore
+*.apk
+*.iml
+
+# --- IDE и внутренние инструменты ---
+.idea/
+.vscode/
+.claude/
+.mcp.json
+.hermes/
+.repowise/
+.pyscn/
+*.bak
+*.bak_*
+*.orig
+
+# --- Логи и ОС ---
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  LLM_API_KEY: test-key-for-ci
+  LLM_API_BASE_URL: https://example.com/v1
+  MODEL: test-model
+  JWT_SECRET: 0123456789abcdef0123456789abcdef
+  REQUIRE_ACCESS: "false"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: rpg_backend/requirements.txt
+
+      - name: Установка зависимостей
+        run: pip install -r rpg_backend/requirements.txt
+
+      - name: Версии
+        run: python -V && pip list | grep -Ei 'pytest|fastapi|aiosqlite|openai'
+
+      - name: Тесты сервисов
+        working-directory: rpg_backend
+        run: timeout 120 pytest -q tests/test_service.py --durations=5
+
+      - name: Тесты чата
+        working-directory: rpg_backend
+        run: timeout 120 pytest -q tests/test_chat.py --durations=5
+
+      - name: Тесты персонажей
+        working-directory: rpg_backend
+        run: timeout 180 pytest -q tests/test_characters.py --durations=5
+
+      # Линт пока не блокирует сборку: в коде есть старые замечания,
+      # их разбираем постепенно. Тесты и сборка образа — обязательны.
+      - name: Стиль кода
+        working-directory: rpg_backend
+        run: ruff check app --output-format=github
+        continue-on-error: true
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Сборка образа
+        run: docker build -t dnd-ai-master:ci ./rpg_backend
+
+      - name: Запуск и проверка /health
+        run: |
+          docker run -d --name ci-smoke -p 8000:8000 \
+            -e LLM_API_KEY=test -e LLM_API_BASE_URL=https://example.com/v1 \
+            -e MODEL=test -e JWT_SECRET=0123456789abcdef0123456789abcdef \
+            dnd-ai-master:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/health; then exit 0; fi
+            sleep 2
+          done
+          docker logs ci-smoke
+          exit 1

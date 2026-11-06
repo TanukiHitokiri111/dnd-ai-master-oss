@@ -1,0 +1,26 @@
+# Имя проекта фиксировано: иначе Compose берёт имя каталога и может
+# столкнуться с другими проектами на том же сервере.
+name: dnd-ai-master
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dnd-ai-master:latest
+    container_name: dnd-ai-master
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    env_file: .env
+    volumes:
+      # База данных, картинки и сцены живут здесь — сохраняйте каталог
+      # между обновлениями, иначе потеряете персонажей и историю чатов.
+      - ./data:/app/data
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
