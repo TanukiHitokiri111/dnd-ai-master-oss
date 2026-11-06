@@ -524,7 +524,7 @@ class _CharacterMasterScreenState extends ConsumerState<CharacterMasterScreen> {
         Scaffold(
           backgroundColor: theme.colorScheme.surface,
           appBar: AppBar(
-            title: Text('Создание персонажа — $_pageLabel($_currentTag)'),
+            title: Text('Создание персонажа — ${_pageLabel(_currentTag)}'),
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),

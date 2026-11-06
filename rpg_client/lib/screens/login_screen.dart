@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 
@@ -13,7 +12,6 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _userCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
-  final _boostyCtrl = TextEditingController();
   bool _isRegister = false;
 
   Future<void> _submit() async {
@@ -23,7 +21,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final auth = ref.read(authProvider.notifier);
       if (_isRegister) {
-        await auth.register(user, pass, _boostyCtrl.text.trim());
+        await auth.register(user, pass);
       } else {
         await auth.login(user, pass);
       }
@@ -71,18 +69,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               decoration: const InputDecoration(labelText: 'Пароль', prefixIcon: Icon(Icons.lock, color: AppTheme.gold)),
               onSubmitted: (_) => _submit(),
             ),
-            if (_isRegister) ...[
-              const SizedBox(height: 16),
-              TextField(
-                controller: _boostyCtrl,
-                style: const TextStyle(color: AppTheme.parchment),
-                decoration: const InputDecoration(
-                  labelText: 'Boosty логин (опционально)',
-                  hintText: 'https://boosty.to/...',
-                  prefixIcon: Icon(Icons.link, color: AppTheme.gold),
-                ),
-              ),
-            ],
             if (state.error != null) ...[
               const SizedBox(height: 12),
               Text(state.error!, style: const TextStyle(color: AppTheme.bloodRed)),
@@ -104,15 +90,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Text(_isRegister ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться',
                 style: TextStyle(color: AppTheme.gold.withValues(alpha: 0.7))),
             ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () async {
-                final uri = Uri.parse('https://t.me/Tanuki_Hitokiri');
-                if (await canLaunchUrl(uri)) await launchUrl(uri);
-              },
-              child: const Text('💬 Поддержка в Telegram',
-                style: TextStyle(color: AppTheme.leather)),
-            ),
           ]),
         ),
       ),
@@ -120,5 +97,5 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   @override
-  void dispose() { _userCtrl.dispose(); _passCtrl.dispose(); _boostyCtrl.dispose(); super.dispose(); }
+  void dispose() { _userCtrl.dispose(); _passCtrl.dispose(); super.dispose(); }
 }

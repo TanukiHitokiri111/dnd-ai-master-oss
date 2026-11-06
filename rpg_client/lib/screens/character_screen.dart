@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../providers/auth_provider.dart';
 import '../providers/chat_provider.dart';
 import '../providers/api_service_provider.dart';
@@ -154,7 +153,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen> {
           ? _buildError()
           : Column(
               children: [
-                if (auth.isLoggedIn) _buildAccessSection(),
                 Expanded(
                   child: _chars.isEmpty
                     ? _buildEmpty()
@@ -252,72 +250,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAccessSection() {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppTheme.gold.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.gold.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(children: [
-            Icon(Icons.card_giftcard, color: AppTheme.gold, size: 18),
-            SizedBox(width: 8),
-            Text('Доступ', style: TextStyle(color: AppTheme.gold, fontWeight: FontWeight.bold, fontSize: 14)),
-          ]),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, '/payment'),
-                  icon: const Icon(Icons.credit_card, size: 16),
-                  label: const Text('Оплатить'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.gold,
-                    side: const BorderSide(color: AppTheme.gold),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _showRedeemCodeDialog(),
-                  icon: const Icon(Icons.vpn_key, size: 16),
-                  label: const Text('Ввести код'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.leather,
-                    side: const BorderSide(color: AppTheme.leather),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                onPressed: () async {
-                  final uri = Uri.parse('https://t.me/Tanuki_Hitokiri');
-                  if (await canLaunchUrl(uri)) await launchUrl(uri);
-                },
-                icon: const Icon(Icons.support_agent, color: AppTheme.leather, size: 20),
-                tooltip: 'Поддержка в Telegram',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -577,15 +509,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen> {
           // Code section
           _buildCodeActivation(),
           const SizedBox(height: 24),
-          // Support link
-          GestureDetector(
-            onTap: () async {
-              final uri = Uri.parse('https://t.me/Tanuki_Hitokiri');
-              if (await canLaunchUrl(uri)) await launchUrl(uri);
-            },
-            child: Text('💬 Написать в поддержку', style: TextStyle(color: AppTheme.leather.withValues(alpha: 0.6), fontSize: 13)),
-          ),
-          const SizedBox(height: 16),
           // Retry button
           OutlinedButton.icon(
             onPressed: _loadChars,
